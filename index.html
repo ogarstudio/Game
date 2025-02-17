@@ -1,75 +1,23 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-    <script>
-      AFRAME.registerComponent("gorilla-move", {
-        schema: { speed: { type: "number", default: 0.4 } },
-        init: function () {
-          this.velocity = new THREE.Vector3();
-          this.player = this.el.object3D;
-          this.prevLeftPos = new THREE.Vector3();
-          this.prevRightPos = new THREE.Vector3();
-          this.leftHand = document.querySelector("#leftHand").object3D;
-          this.rightHand = document.querySelector("#rightHand").object3D;
-
-          // Initialize player position with a much smaller height
-          this.player.position.set(0, 0.5, 0);  // Even lower player height (y = 0.5)
-        },
-        tick: function (time, delta) {
-          const hands = [
-            { obj: this.leftHand, prev: this.prevLeftPos },
-            { obj: this.rightHand, prev: this.prevRightPos }
-          ];
-
-          hands.forEach((handData) => {
-            let hand = handData.obj;
-            let prevPos = handData.prev;
-            let handPos = hand.position.clone();
-
-            if (handPos.y < 0.2) { // Hand touches the ground
-              let movement = handPos.clone().sub(prevPos); // Calculate hand movement
-              this.velocity.add(movement.negate().multiplyScalar(this.data.speed));
-            }
-
-            prevPos.copy(handPos);
-          });
-
-          // Apply velocity to player movement
-          this.player.position.addScaledVector(this.velocity, delta / 1000);
-          this.velocity.multiplyScalar(0.85); // Apply friction
-          
-          // Prevent player from falling through floor
-          if (this.player.position.y < 0.5) { // Set the floor height to 0.5
-            this.player.position.y = 0.5;
-            this.velocity.y = 0;
-          }
-        }
-      });
-    </script>
+    <title>Simple VR Game</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   </head>
   <body>
     <a-scene>
-      <!-- VR Setup -->
-      <a-entity id="player" gorilla-move>
-        <a-entity camera position="0 0.5 0"></a-entity>  <!-- Adjusted camera height to 0.5 -->
+      <!-- Camera for VR view -->
+      <a-camera position="0 1.6 0"></a-camera>
 
-        <!-- Left Hand -->
-        <a-entity id="leftHand" oculus-touch-controls="hand: left" vive-controls="hand: left">
-          <a-cylinder height="0.5" radius="0.05" color="brown"></a-cylinder> <!-- Arm -->
-          <a-sphere position="0 -0.3 0" radius="0.08" color="black"></a-sphere> <!-- Hand -->
-        </a-entity>
+      <!-- Ground -->
+      <a-plane rotation="-90 0 0" width="10" height="10" color="#7BC8A4"></a-plane>
 
-        <!-- Right Hand -->
-        <a-entity id="rightHand" oculus-touch-controls="hand: right" vive-controls="hand: right">
-          <a-cylinder height="0.5" radius="0.05" color="brown"></a-cylinder>
-          <a-sphere position="0 -0.3 0" radius="0.08" color="black"></a-sphere>
-        </a-entity>
-      </a-entity>
+      <!-- Box (interactive object) -->
+      <a-box position="0 1 0" color="#4CC3D9" depth="1" height="1" width="1"></a-box>
 
-      <!-- Environment -->
-      <a-plane position="0 0 -5" rotation="-90 0 0" width="10" height="10" color="green"></a-plane>
-      <a-box position="0 1 -3" width="1" height="1" depth="1" color="blue"></a-box> <!-- Obstacle -->
+      <!-- Lights -->
+      <a-light type="directional" position="2 4 -3" intensity="0.5"></a-light>
+      <a-light type="ambient" color="#FFF" intensity="0.2"></a-light>
     </a-scene>
   </body>
 </html>
