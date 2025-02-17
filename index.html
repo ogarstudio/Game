@@ -1,59 +1,38 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>VR Island Explorer</title>
+  <head>
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-    <script src="https://cdn.rawgit.com/donmccurdy/aframe-extras/master/dist/aframe-extras.controls.min.js"></script>
-</head>
-<body>
+    <script>
+      AFRAME.registerComponent("gorilla-move", {
+        schema: { speed: { type: "number", default: 0.1 } },
+        init: function () {
+          this.velocity = new THREE.Vector3();
+          this.el.sceneEl.addEventListener("triggerdown", (event) => {
+            const hand = event.target;
+            const direction = new THREE.Vector3();
+            hand.object3D.getWorldDirection(direction);
+            this.velocity.add(direction.multiplyScalar(-this.data.speed));
+          });
+        },
+        tick: function (time, delta) {
+          let player = this.el.object3D;
+          player.position.addScaledVector(this.velocity, delta / 1000);
+          this.velocity.multiplyScalar(0.9); // Slow down over time
+        },
+      });
+    </script>
+  </head>
+  <body>
     <a-scene>
-        <!-- Lighting -->
-        <a-light type="directional" position="1 2 1" intensity="0.8"></a-light>
-        <a-light type="ambient" intensity="0.5"></a-light>
-        
-        <!-- Sky -->
-        <a-sky color="#87CEEB"></a-sky>
-        
-        <!-- Islands -->
-        <a-cylinder position="0 -0.5 -4" radius="4" height="0.5" color="#228B22"></a-cylinder>
-        <a-cylinder position="-3 -0.5 -6" radius="3" height="0.5" color="#2E8B57"></a-cylinder>
-        <a-cylinder position="3 -0.5 -8" radius="2" height="0.5" color="#3CB371"></a-cylinder>
-        <a-cylinder position="-2 -0.5 -10" radius="3.5" height="0.5" color="#32CD32"></a-cylinder>
-        <a-cylinder position="4 -0.5 -12" radius="2.5" height="0.5" color="#006400"></a-cylinder>
-        
-        <!-- Player (Camera with Joystick) -->
-        <a-entity id="player" position="0 1.6 0" movement-controls="fly: false">
-            <a-camera>
-                <a-cursor color="black"></a-cursor>
-            </a-camera>
-            <a-entity oculus-touch-controls="hand: left"></a-entity>
-            <a-entity oculus-touch-controls="hand: right"></a-entity>
-        </a-entity>
-        
-        <!-- Joystick Controls -->
-        <a-entity id="joystick" position="0 0 -1" joystick-controls></a-entity>
-        
-        <!-- Jump Mechanic -->
-        <a-entity id="jump-handler" aframe-injected></a-entity>
-        <script>
-            document.addEventListener("keydown", function(event) {
-                if (event.key === "a") {
-                    let player = document.querySelector("#player");
-                    player.setAttribute("position", {
-                        x: player.object3D.position.x,
-                        y: player.object3D.position.y + 1,
-                        z: player.object3D.position.z
-                    });
-                    setTimeout(() => {
-                        player.setAttribute("position", {
-                            x: player.object3D.position.x,
-                            y: player.object3D.position.y - 1,
-                            z: player.object3D.position.z
-                        });
-                    }, 500);
-                }
-            });
-        </script>
+      <!-- Player Rig with VR Controllers -->
+      <a-entity id="player" gorilla-move>
+        <a-entity camera position="0 1.6 0"></a-entity>
+        <a-entity id="leftHand" oculus-touch-controls="hand: left"></a-entity>
+        <a-entity id="rightHand" oculus-touch-controls="hand: right"></a-entity>
+      </a-entity>
+
+      <!-- Environment -->
+      <a-box position="0 0 -3" width="10" height="1" depth="10" color="green"></a-box>
     </a-scene>
-</body>
+  </body>
 </html>
