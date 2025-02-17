@@ -13,8 +13,8 @@
           this.leftHand = document.querySelector("#leftHand").object3D;
           this.rightHand = document.querySelector("#rightHand").object3D;
 
-          // Set initial player position to the floor
-          this.player.position.set(0, 1.0, 0);  // Ensure player starts on the ground
+          // Set initial player position to the floor (lower player to y=0.5)
+          this.player.position.set(0, 0.5, 0);  // Adjust player height closer to the ground
         },
         tick: function (time, delta) {
           const hands = [
@@ -40,8 +40,8 @@
           this.velocity.multiplyScalar(0.85); // Apply friction
           
           // Prevent player from falling through floor
-          if (this.player.position.y < 1.0) {
-            this.player.position.y = 1.0;
+          if (this.player.position.y < 0.5) {  // Ensure player doesn't fall below ground
+            this.player.position.y = 0.5;
             this.velocity.y = 0;
           }
         }
@@ -52,8 +52,8 @@
     <a-scene>
       <!-- Player Rig -->
       <a-entity id="player" gorilla-move>
-        <a-entity camera position="0 1.6 0"></a-entity>
-        
+        <a-entity camera position="0 0.5 0"></a-entity>  <!-- Adjusted camera height to 0.5 -->
+
         <!-- Left Hand -->
         <a-entity id="leftHand" oculus-touch-controls="hand: left">
           <a-cylinder height="0.5" radius="0.05" color="brown"></a-cylinder> <!-- Arm -->
