@@ -3,6 +3,7 @@
 <head>
     <title>VR Island Explorer</title>
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="https://cdn.rawgit.com/donmccurdy/aframe-extras/master/dist/aframe-extras.controls.min.js"></script>
 </head>
 <body>
     <a-scene>
@@ -13,19 +14,46 @@
         <!-- Sky -->
         <a-sky color="#87CEEB"></a-sky>
         
-        <!-- Ground (Floating Island) -->
+        <!-- Islands -->
         <a-cylinder position="0 -0.5 -4" radius="4" height="0.5" color="#228B22"></a-cylinder>
+        <a-cylinder position="-3 -0.5 -6" radius="3" height="0.5" color="#2E8B57"></a-cylinder>
+        <a-cylinder position="3 -0.5 -8" radius="2" height="0.5" color="#3CB371"></a-cylinder>
+        <a-cylinder position="-2 -0.5 -10" radius="3.5" height="0.5" color="#32CD32"></a-cylinder>
+        <a-cylinder position="4 -0.5 -12" radius="2.5" height="0.5" color="#006400"></a-cylinder>
         
-        <!-- Player (Camera) -->
-        <a-entity position="0 1.6 0">
+        <!-- Player (Camera with Joystick) -->
+        <a-entity id="player" position="0 1.6 0" movement-controls="fly: false">
             <a-camera>
                 <a-cursor color="black"></a-cursor>
             </a-camera>
+            <a-entity oculus-touch-controls="hand: left"></a-entity>
+            <a-entity oculus-touch-controls="hand: right"></a-entity>
         </a-entity>
         
-        <!-- Interactive Objects -->
-        <a-box position="-1 0.5 -3" rotation="0 45 0" color="#FF5733" animation="property: rotation; to: 0 405 0; loop: true; dur: 3000"></a-box>
-        <a-sphere position="1 0.7 -3" radius="0.5" color="#FFD700" animation="property: position; to: 1 1.2 -3; loop: true; dir: alternate; dur: 2000"></a-sphere>
+        <!-- Joystick Controls -->
+        <a-entity id="joystick" position="0 0 -1" joystick-controls></a-entity>
+        
+        <!-- Jump Mechanic -->
+        <a-entity id="jump-handler" aframe-injected></a-entity>
+        <script>
+            document.addEventListener("keydown", function(event) {
+                if (event.key === "a") {
+                    let player = document.querySelector("#player");
+                    player.setAttribute("position", {
+                        x: player.object3D.position.x,
+                        y: player.object3D.position.y + 1,
+                        z: player.object3D.position.z
+                    });
+                    setTimeout(() => {
+                        player.setAttribute("position", {
+                            x: player.object3D.position.x,
+                            y: player.object3D.position.y - 1,
+                            z: player.object3D.position.z
+                        });
+                    }, 500);
+                }
+            });
+        </script>
     </a-scene>
 </body>
 </html>
