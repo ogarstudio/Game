@@ -3,15 +3,49 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>VR Adventure Game</title>
+    <title>VR Adventure Game with Controller</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aframe-extras/dist/aframe-extras.min.js"></script>
+    <script>
+      // Custom script for movement and jumping with Oculus controllers
+      AFRAME.registerComponent('controller-movement', {
+        init: function () {
+          this.camera = document.querySelector('a-camera');
+          this.velocity = new THREE.Vector3();
+          this.acceleration = new THREE.Vector3();
+          this.speed = 0.1;
+        },
+
+        tick: function () {
+          const controller = this.el;
+          const joystick = controller.components['tracked-controls'].controller;
+          const buttonA = joystick.buttons[0].pressed; // A button for jump
+          
+          // Movement control using the joystick
+          const movement = joystick.axes;
+          const moveX = movement[0]; // Horizontal movement (X-axis)
+          const moveZ = movement[1]; // Forward/backward movement (Y-axis)
+          
+          // Move camera based on joystick position
+          this.velocity.x = moveX * this.speed;
+          this.velocity.z = moveZ * this.speed;
+          
+          // Apply velocity to camera position
+          this.camera.object3D.position.add(this.velocity);
+
+          // Jumping when A button is pressed
+          if (buttonA) {
+            this.velocity.y = 0.5; // Jump height
+            this.camera.object3D.position.y += this.velocity.y;
+          }
+        },
+      });
+    </script>
   </head>
   <body style="margin: 0; overflow: hidden">
     <a-scene>
-      <!-- Camera with cursor for interactions -->
-      <a-camera position="0 1.6 0">
-        <a-cursor color="#FF0000" raycast="objects: .clickable"></a-cursor>
-      </a-camera>
+      <!-- Camera with controller movement -->
+      <a-camera position="0 1.6 0" id="camera" controller-movement="enabled: true"></a-camera>
 
       <!-- Sky -->
       <a-sky color="#87CEEB"></a-sky>
@@ -20,7 +54,7 @@
       <a-plane rotation="-90 0 0" width="100" height="100" color="#228B22"></a-plane>
 
       <!-- Interactive Cube (click to change color) -->
-      <a-box position="0 1 0" rotation="0 45 0" color="#FF6347" class="clickable" depth="1" height="1" width="1" 
+      <a-box position="0 1 0" rotation="0 45 0" color="#FF6347" class="clickable" depth="1" height="1" width="1"
              event-set__click="color: #FFFF00"></a-box>
 
       <!-- Floating Trees -->
@@ -37,6 +71,11 @@
       <!-- Interactive Wall (click to teleport) -->
       <a-box position="10 1 -10" width="5" height="5" depth="0.1" color="#0000FF" class="clickable"
              event-set__click="position: 0 1 0"></a-box>
+      
+      <!-- Oculus Controllers -->
+      <a-entity oculus-touch-controls="hand: left" position="0 1.5 0"></a-entity>
+      <a-entity oculus-touch-controls="hand: right" position="0 1.5 0"></a-entity>
+
     </a-scene>
   </body>
 </html>
