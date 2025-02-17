@@ -4,28 +4,44 @@
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <script>
       AFRAME.registerComponent("gorilla-move", {
-        schema: { speed: { type: "number", default: 0.2 } },
+        schema: { speed: { type: "number", default: 0.4 } },
         init: function () {
           this.velocity = new THREE.Vector3();
-          this.leftHand = document.querySelector("#leftHand");
-          this.rightHand = document.querySelector("#rightHand");
           this.player = this.el.object3D;
+          this.prevLeftPos = new THREE.Vector3();
+          this.prevRightPos = new THREE.Vector3();
+          this.leftHand = document.querySelector("#leftHand").object3D;
+          this.rightHand = document.querySelector("#rightHand").object3D;
         },
         tick: function (time, delta) {
-          const hands = [this.leftHand, this.rightHand];
-          hands.forEach((hand) => {
-            let handPos = hand.object3D.position;
-            if (handPos.y < 0.2) { // If hands are close to the ground
-              let pushDir = new THREE.Vector3();
-              hand.object3D.getWorldDirection(pushDir);
-              pushDir.y = 0; // No vertical movement
-              this.velocity.add(pushDir.negate().multiplyScalar(this.data.speed));
+          const hands = [
+            { obj: this.leftHand, prev: this.prevLeftPos },
+            { obj: this.rightHand, prev: this.prevRightPos }
+          ];
+
+          hands.forEach((handData) => {
+            let hand = handData.obj;
+            let prevPos = handData.prev;
+            let handPos = hand.position.clone();
+
+            if (handPos.y < 0.2) { // Hand touches the ground
+              let movement = handPos.clone().sub(prevPos); // Calculate hand movement
+              this.velocity.add(movement.negate().multiplyScalar(this.data.speed));
             }
+
+            prevPos.copy(handPos);
           });
-          
+
+          // Apply velocity to player movement
           this.player.position.addScaledVector(this.velocity, delta / 1000);
-          this.velocity.multiplyScalar(0.8); // Apply friction
-        },
+          this.velocity.multiplyScalar(0.85); // Apply friction
+          
+          // Prevent player from falling through floor
+          if (this.player.position.y < 1.0) {
+            this.player.position.y = 1.0;
+            this.velocity.y = 0;
+          }
+        }
       });
     </script>
   </head>
