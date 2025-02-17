@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>VR Island Explorer</title>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+</head>
+<body>
+    <a-scene>
+        <!-- Lighting -->
+        <a-light type="directional" position="1 2 1" intensity="0.8"></a-light>
+        <a-light type="ambient" intensity="0.5"></a-light>
+        
+        <!-- Sky -->
+        <a-sky color="#87CEEB"></a-sky>
+        
+        <!-- Ground (Floating Island) -->
+        <a-cylinder position="0 -0.5 -4" radius="4" height="0.5" color="#228B22"></a-cylinder>
+        
+        <!-- Player (Camera) -->
+        <a-entity position="0 1.6 0">
+            <a-camera>
+                <a-cursor color="black"></a-cursor>
+            </a-camera>
+        </a-entity>
+        
+        <!-- Interactive Objects -->
+        <a-box position="-1 0.5 -3" rotation="0 45 0" color="#FF5733" animation="property: rotation; to: 0 405 0; loop: true; dur: 3000"></a-box>
+        <a-sphere position="1 0.7 -3" radius="0.5" color="#FFD700" animation="property: position; to: 1 1.2 -3; loop: true; dir: alternate; dur: 2000"></a-sphere>
+    </a-scene>
+</body>
+</html>
