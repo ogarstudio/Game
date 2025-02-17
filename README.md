@@ -1,1 +1,1 @@
-When you open the file type at the end (index.html)
+if it doesnt work copy paste this (https://ogarstudio.github.io/Game/index.html
